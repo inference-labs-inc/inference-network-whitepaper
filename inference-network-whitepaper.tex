@@ -62,7 +62,7 @@
 {Inference Labs Inc. - \url{inferencelabs.com}}\\
 %E-mails: investor@inferencelabs.com
 }
-\IEEEauthorblockN{13 April 2024 (v1.2)}%, xyz i\IEEEauthorrefmark{1} and xyzi \IEEEauthorrefmark{1} and xyzz\IEEEauthorrefmark{1} and xyz\IEEEauthorrefmark{1}}
+\IEEEauthorblockN{December 2025 (v2.0)}%, xyz i\IEEEauthorrefmark{1} and xyzi \IEEEauthorrefmark{1} and xyzz\IEEEauthorrefmark{1} and xyz\IEEEauthorrefmark{1}}
 
 }
 \maketitle
@@ -172,9 +172,15 @@ Our proposed system, Inference Network, aims to leverage blockchain technology t
 \section{Technological Foundations: Exploring Key Technologies}
 To integrate AI and Web3 and provide a comprehensive list of capabilities, we explore various technologies in this section. Some of these technologies are utilized in designing Inference Network version 1, while others are not yet practical for implementation. However, it's essential to note that Inference Network will continually update to incorporate any advancements in technologies to evolve into a more practical solution over time.
 
-\subsection{Technologies used in Inference Network 1.0}
+\subsection{Technologies used in Inference Network}
 
-This subsection delves deeper into describing the technologies utilized in designing Inference Network 1.0.
+This subsection describes the core technologies utilized in Inference Network.
+
+\subsubsection{EigenLayer and Actively Validated Services (AVS)}
+
+Inference Network is built as an Actively Validated Service (AVS) on EigenLayer. EigenLayer is a restaking protocol on Ethereum that allows staked ETH to be used as cryptoeconomic security for services beyond the Ethereum consensus layer. By building on EigenLayer, Inference Network inherits security from Ethereum's validator set. A native token facilitates payment for inference services and network governance.
+
+Key EigenLayer components utilized include the DelegationManager for operator registration and stake delegation, the AllocationManager for stake allocation and slashing enforcement, and the RewardsCoordinator for reward distribution. This integration provides economic security: operators who submit incorrect inference results can have their staked tokens slashed, creating a strong financial incentive for honest behavior.
 
 \subsubsection{Blockchain}
 
@@ -327,8 +333,9 @@ This adaptability is a core characteristic, anticipating the need to integrate a
     \label{fig:Fig 2}
 \end{figure}
 
-These pools consist of registered nodes that are assigned to process specific models' inference workloads. After registration, a model node becomes part of the available workforce. A node may service multiple models, and it is incumbent upon the node operator to ensure the successful completion of assigned tasks. Nodes pledge a certain amount of computational power and time to the network. With the computational requirements of workloads being predetermined, the network allocates tasks accordingly and does not exceed a node's capacity. A node is expected to fulfill its commitments within the epoch it is registered. Any failure to perform, or indication of unavailability, may result in penalties to the node.
+These pools consist of registered nodes that are assigned to process specific models' inference workloads. After registration, a model node becomes part of the available workforce. A node may service multiple models, and it is incumbent upon the node operator to ensure the successful completion of assigned tasks. Nodes pledge a certain amount of computational power, measured in FUCUs (Functional Units of CompUte), to the network. With the computational requirements of workloads being predetermined, the network allocates tasks accordingly and does not exceed a node's capacity. A node is expected to fulfill its commitments within the epoch it is registered. Any failure to perform, or indication of unavailability, may result in slashing of staked collateral via EigenLayer.
 
+\textit{Aggregator Service: }The Aggregator is an off-chain service that coordinates the network. It submits inference tasks, probabilistically challenges completed tasks for verification, verifies EZKL proofs submitted by operators, and calls resolveTask to trigger rewards or slashing based on verification results. The aggregator role is designed to be permissionless, allowing any party to participate in network coordination.
 
 \subsection{Persistent Storage}
 
@@ -350,7 +357,36 @@ This solution can reduce wait times for users, while still solving the efficienc
 
 \subsection{On-chain Architecture}
 
-The on-chain component of the Inference Network system acts as the interface for end users and dApps.  Users or dApps submit workloads, which include all necessary details like input, precommitment, and destination. This on-chain architecture consists of three main components: The Inference Market, Model Registry, and Verifier Contracts.
+The on-chain component of the Inference Network system acts as the interface for end users and dApps.  Users or dApps submit workloads, which include all necessary details like input, precommitment, and destination. The on-chain architecture consists of smart contracts deployed on Ethereum: InferenceServiceManager (EigenLayer AVS integration), InferenceTaskManager (task lifecycle orchestration), InferenceNodesManager (operator node registry and FUCU tracking), and ModelRegistry (model metadata and verification strategies).
+
+\begin{figure}[!ht]
+    \centering
+    \scalebox{0.65}{
+\tikz{
+\tikzstyle{box}=[draw, inner sep=6pt, outer sep=0pt, minimum width=3cm, minimum height=0.8cm, align=center, font=\small]
+\tikzstyle{container}=[draw, inner sep=10pt, outer sep=0pt, align=center]
+
+\node[container, minimum width=10cm, minimum height=2.8cm] (eigen) {};
+\node[above] at (eigen.north) {\textbf{EigenLayer Core}};
+\node[box] (delegation) at (-2.5,0.3) {DelegationManager};
+\node[box] (allocation) at (2.5,0.3) {AllocationManager};
+\node[box] (rewards) at (0,-0.7) {RewardsCoordinator};
+
+\node[box, below=1.5cm of eigen] (service) {InferenceServiceManager};
+
+\node[box, below left=1cm and 0.5cm of service] (task) {TaskManager};
+\node[box, below=1cm of service] (nodes) {NodesManager};
+\node[box, below right=1cm and 0.5cm of service] (registry) {ModelRegistry};
+
+\draw[-triangle 45] (eigen)--(service);
+\draw[-triangle 45] (service)--(task);
+\draw[-triangle 45] (service)--(nodes);
+\draw[-triangle 45] (service)--(registry);
+}
+}
+    \caption{EigenLayer Integration Architecture}
+    \label{fig:eigenlayer-arch}
+\end{figure}
 
 \subsection{Inference Market}
 
@@ -358,7 +394,7 @@ The ecosystem is anchored by an Inference Market. The protocol has a native queu
 
 \subsection{Model Registry}
 
-After circuitizing a model with the Inference Network SDK, its creator will register it on the network. This defines the required input and output data format, computational cost of inferences on the model (proportional to cost of compute for an inference) and the verification key for use in a verification contract upon completion of each inference from the model.
+After circuitizing a model with the Inference Network SDK, its creator registers it on the network. This defines the required input and output data format, computational cost in FUCUs (Functional Units of CompUte), and the verification strategy (on-chain via verifier contract or off-chain via aggregator). The registry also stores the verifier contract address for on-chain verification and enforces registration fees to prevent spam.
 
 \subsection{Model Node Pool Registration}
 
@@ -392,7 +428,37 @@ In order to complete inference workloads for a model, a model node must register
 
 The network implements sets of blocks, called epochs, in which a registered node must be available. Nodes that register in the current epoch are activated during the following epoch. Model nodes commit compute units per unit of time to the network. Since the compute units for a workload are known ahead of time the network delegates workloads to fill but not exceed its compute capacity.
 
-It is the expectation that a model node will complete delegated workloads during a registered epoch. Model nodes which fail to complete work while registered or otherwise shown to be unavailable will face a penalty.
+It is the expectation that a model node will complete delegated workloads during a registered epoch. Model nodes which fail to complete work while registered or otherwise shown to be unavailable will face slashing via EigenLayer.
+
+Tasks follow a lifecycle managed by the InferenceTaskManager, as illustrated in Figure~\ref{fig:task-lifecycle}.
+
+\begin{figure}[!ht]
+    \centering
+    \scalebox{0.65}{
+\tikz{
+\tikzstyle{state}=[draw, inner sep=0pt, outer sep=0pt, minimum width=2.4cm, minimum height=0.9cm, rounded corners=2mm, align=center, font=\small]
+\tikzstyle{decision}=[draw, diamond, inner sep=0pt, outer sep=0pt, minimum width=1.6cm, minimum height=1.6cm, align=center, font=\scriptsize]
+
+\node[state] (created) {CREATED};
+\node[state, below=0.8cm of created] (assigned) {ASSIGNED};
+\node[state, below=0.8cm of assigned] (completed) {COMPLETED};
+\node[decision, below=0.8cm of completed] (challenge) {Challenge?};
+\node[state, below=0.8cm of challenge] (challenged) {CHALLENGED};
+\node[state, below=0.8cm of challenged] (resolved) {RESOLVED};
+\node[state, right=1.5cm of resolved] (rejected) {REJECTED};
+
+\draw[-triangle 45] (created)--node[right, font=\scriptsize] {sendTask} (assigned);
+\draw[-triangle 45] (assigned)--node[right, font=\scriptsize] {submitOutput} (completed);
+\draw[-triangle 45] (completed)--(challenge);
+\draw[-triangle 45] (challenge)--node[right, font=\scriptsize] {Yes} (challenged);
+\draw[-triangle 45] (challenge.west)--node[above, font=\scriptsize] {No} ++(-1.5,0)|-(resolved.west);
+\draw[-triangle 45] (challenged)--node[right, font=\scriptsize] {Valid} (resolved);
+\draw[-triangle 45] (challenged.east)--node[above, font=\scriptsize] {Invalid} ++(1.5,0)--(rejected.north);
+}
+}
+    \caption{Task Lifecycle State Machine}
+    \label{fig:task-lifecycle}
+\end{figure}
 
 \subsection{Model Vetting}
 
