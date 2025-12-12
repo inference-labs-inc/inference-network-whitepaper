@@ -14,6 +14,7 @@
 \usepackage{algorithm}
 \usepackage{multirow}
 \usepackage{flushend}
+\usepackage{float}
 \usepackage{subfigure}
 \usepackage{url}
 \usepackage{pgfplots, tikz, amsmath, amssymb, tkz-euclide,tikz-layers,etoolbox,fontawesome5,colortbl}
@@ -222,7 +223,7 @@ For consumers of AI predictions, Inference Network offers an additional layer of
 
 \subsection{Technical Architecture}
 
-To address current blockchain limitations and challenges of running on-chain Neural Networks, Inference Network is designed to serve as a conduit between off-chain and on-chain architectures. Taking a forward-looking approach, the Inference Network architecture is inherently modular, a design philosophy for each component of the system to be individually updated or replaced.
+To address current blockchain limitations and challenges of running on-chain Neural Networks, Inference Network is designed to serve as a conduit between off-chain and on-chain architectures, as shown in Figure~\ref{fig:Fig 1}. Taking a forward-looking approach, the Inference Network architecture is inherently modular, a design philosophy for each component of the system to be individually updated or replaced.
 
 \begin{figure}[!ht]
     \centering
@@ -271,7 +272,7 @@ This adaptability is a core characteristic, anticipating the need to integrate a
 
 \subsection{Off-Chain Architecture}
 
-\textit{Node Pools: }The off-chain infrastructure and computational power of Inference Network is based around node pools.
+\textit{Node Pools: }The off-chain infrastructure and computational power of Inference Network is based around node pools, with epoch-based registration shown in Figure~\ref{fig:Fig 2}.
 
 \begin{figure}[!ht]
     \centering
@@ -357,9 +358,9 @@ This solution can reduce wait times for users, while still solving the efficienc
 
 \subsection{On-chain Architecture}
 
-The on-chain component of the Inference Network system acts as the interface for end users and dApps.  Users or dApps submit workloads, which include all necessary details like input, precommitment, and destination. The on-chain architecture consists of smart contracts deployed on Ethereum: InferenceServiceManager (stake-backed security integration), InferenceTaskManager (task lifecycle orchestration), InferenceNodesManager (operator node registry and FUCU tracking), and ModelRegistry (model metadata and verification strategies).
+The on-chain component of the Inference Network system acts as the interface for end users and dApps.  Users or dApps submit workloads, which include all necessary details like input, precommitment, and destination. The on-chain architecture consists of smart contracts deployed on Ethereum: InferenceServiceManager (stake-backed security integration), InferenceTaskManager (task lifecycle orchestration), InferenceNodesManager (operator node registry and FUCU tracking), and ModelRegistry (model metadata and verification strategies). The security integration architecture is illustrated in Figure~\ref{fig:security-arch}.
 
-\begin{figure}[!ht]
+\begin{figure}[htbp]
     \centering
     \scalebox{0.65}{
 \tikz{
@@ -409,7 +410,7 @@ After circuitizing a model with the Inference Network SDK, its creator registers
 
 \subsection{Model Node Pool Registration}
 
-In order to complete inference workloads for a model, a model node must register its intent to complete workloads for specific models. Once registered the node is added to the pool of available nodes. Nodes may be registered to service multiple models, but it is the responsibility of the operator to ensure the node completes assigned workloads.
+In order to complete inference workloads for a model, a model node must register its intent to complete workloads for specific models, as shown in Figure~\ref{fig:Fig 3}. Once registered the node is added to the pool of available nodes. Nodes may be registered to service multiple models, but it is the responsibility of the operator to ensure the node completes assigned workloads.
 
 \begin{figure}[!ht]
     \centering
@@ -443,7 +444,7 @@ It is the expectation that a model node will complete delegated workloads during
 
 Tasks follow a lifecycle managed by the InferenceTaskManager, as illustrated in Figure~\ref{fig:task-lifecycle}.
 
-\begin{figure}[!ht]
+\begin{figure}[htbp]
     \centering
     \scalebox{0.65}{
 \tikz{
