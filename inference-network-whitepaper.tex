@@ -14,6 +14,7 @@
 \usepackage{algorithm}
 \usepackage{multirow}
 \usepackage{flushend}
+\usepackage{float}
 \usepackage{subfigure}
 \usepackage{url}
 \usepackage{pgfplots, tikz, amsmath, amssymb, tkz-euclide,tikz-layers,etoolbox,fontawesome5,colortbl}
@@ -62,7 +63,7 @@
 {Inference Labs Inc. - \url{inferencelabs.com}}\\
 %E-mails: investor@inferencelabs.com
 }
-\IEEEauthorblockN{13 April 2024 (v1.2)}%, xyz i\IEEEauthorrefmark{1} and xyzi \IEEEauthorrefmark{1} and xyzz\IEEEauthorrefmark{1} and xyz\IEEEauthorrefmark{1}}
+\IEEEauthorblockN{December 2025 (v2.0)}%, xyz i\IEEEauthorrefmark{1} and xyzi \IEEEauthorrefmark{1} and xyzz\IEEEauthorrefmark{1} and xyz\IEEEauthorrefmark{1}}
 
 }
 \maketitle
@@ -172,9 +173,15 @@ Our proposed system, Inference Network, aims to leverage blockchain technology t
 \section{Technological Foundations: Exploring Key Technologies}
 To integrate AI and Web3 and provide a comprehensive list of capabilities, we explore various technologies in this section. Some of these technologies are utilized in designing Inference Network version 1, while others are not yet practical for implementation. However, it's essential to note that Inference Network will continually update to incorporate any advancements in technologies to evolve into a more practical solution over time.
 
-\subsection{Technologies used in Inference Network 1.0}
+\subsection{Technologies used in Inference Network}
 
-This subsection delves deeper into describing the technologies utilized in designing Inference Network 1.0.
+This subsection describes the core technologies utilized in Inference Network.
+
+\subsubsection{Stake-Backed Security}
+
+Inference Network utilizes a stake-backed security model where operators must lock collateral to participate in the network. This cryptoeconomic security mechanism ensures honest behavior: operators who submit incorrect inference results can have their staked tokens slashed, creating a strong financial incentive for correctness.
+
+The security model integrates with existing proof-of-stake infrastructure, allowing the network to inherit economic security from established validator sets. Key components include delegation management for operator registration and stake delegation, allocation management for stake distribution and slashing enforcement, and reward coordination for incentive distribution. A native token facilitates payment for inference services and network governance.
 
 \subsubsection{Blockchain}
 
@@ -216,7 +223,7 @@ For consumers of AI predictions, Inference Network offers an additional layer of
 
 \subsection{Technical Architecture}
 
-To address current blockchain limitations and challenges of running on-chain Neural Networks, Inference Network is designed to serve as a conduit between off-chain and on-chain architectures. Taking a forward-looking approach, the Inference Network architecture is inherently modular, a design philosophy for each component of the system to be individually updated or replaced.
+To address current blockchain limitations and challenges of running on-chain Neural Networks, Inference Network is designed to serve as a conduit between off-chain and on-chain architectures, as shown in Figure~\ref{fig:Fig 1}. Taking a forward-looking approach, the Inference Network architecture is inherently modular, a design philosophy for each component of the system to be individually updated or replaced.
 
 \begin{figure}[!ht]
     \centering
@@ -265,7 +272,7 @@ This adaptability is a core characteristic, anticipating the need to integrate a
 
 \subsection{Off-Chain Architecture}
 
-\textit{Node Pools: }The off-chain infrastructure and computational power of Inference Network is based around node pools.
+\textit{Node Pools: }The off-chain infrastructure and computational power of Inference Network is based around node pools, with epoch-based registration shown in Figure~\ref{fig:Fig 2}.
 
 \begin{figure}[!ht]
     \centering
@@ -327,8 +334,9 @@ This adaptability is a core characteristic, anticipating the need to integrate a
     \label{fig:Fig 2}
 \end{figure}
 
-These pools consist of registered nodes that are assigned to process specific models' inference workloads. After registration, a model node becomes part of the available workforce. A node may service multiple models, and it is incumbent upon the node operator to ensure the successful completion of assigned tasks. Nodes pledge a certain amount of computational power and time to the network. With the computational requirements of workloads being predetermined, the network allocates tasks accordingly and does not exceed a node's capacity. A node is expected to fulfill its commitments within the epoch it is registered. Any failure to perform, or indication of unavailability, may result in penalties to the node.
+These pools consist of registered nodes that are assigned to process specific models' inference workloads. After registration, a model node becomes part of the available workforce. A node may service multiple models, and it is incumbent upon the node operator to ensure the successful completion of assigned tasks. Nodes pledge a certain amount of computational power, measured in FUCU (Foundational Universal Compute Units), to the network. With the computational requirements of workloads being predetermined, the network allocates tasks accordingly and does not exceed a node's capacity. A node is expected to fulfill its commitments within the epoch it is registered. Any failure to perform, or indication of unavailability, may result in slashing of staked collateral.
 
+\textit{Aggregator Service: }The Aggregator is an off-chain service that coordinates the network. It submits inference tasks, probabilistically challenges completed tasks for verification, verifies EZKL proofs submitted by operators, and calls resolveTask to trigger rewards or slashing based on verification results. The aggregator role is designed to be permissionless, allowing any party to participate in network coordination.
 
 \subsection{Persistent Storage}
 
@@ -350,19 +358,59 @@ This solution can reduce wait times for users, while still solving the efficienc
 
 \subsection{On-chain Architecture}
 
-The on-chain component of the Inference Network system acts as the interface for end users and dApps.  Users or dApps submit workloads, which include all necessary details like input, precommitment, and destination. This on-chain architecture consists of three main components: The Inference Market, Model Registry, and Verifier Contracts.
+The on-chain component of the Inference Network system acts as the interface for end users and dApps.  Users or dApps submit workloads, which include all necessary details like input, precommitment, and destination. The on-chain architecture consists of smart contracts deployed on Ethereum: InferenceServiceManager (stake-backed security integration), InferenceTaskManager (task lifecycle orchestration), InferenceNodesManager (operator node registry and FUCU tracking), and ModelRegistry (model metadata and verification strategies). The security integration architecture is illustrated in Figure~\ref{fig:security-arch}.
+
+\begin{figure}[htbp]
+    \centering
+    \scalebox{0.65}{
+\tikz{
+\tikzstyle{box}=[draw, inner sep=6pt, outer sep=0pt, minimum width=3cm, minimum height=0.8cm, align=center, font=\small]
+\tikzstyle{container}=[draw, inner sep=10pt, outer sep=0pt, align=center]
+
+\node[container, minimum width=10cm, minimum height=2.8cm] (security) {};
+\node[above] at (security.north) {\textbf{Stake-Backed Security Layer}};
+\node[box] (delegation) at (-2.5,0.3) {DelegationManager};
+\node[box] (allocation) at (2.5,0.3) {AllocationManager};
+\node[box] (rewards) at (0,-0.7) {RewardsCoordinator};
+
+\node[box, below=1.5cm of security] (service) {InferenceServiceManager};
+
+\node[box, below left=1cm and 0.5cm of service] (task) {TaskManager};
+\node[box, below=1cm of service] (nodes) {NodesManager};
+\node[box, below right=1cm and 0.5cm of service] (registry) {ModelRegistry};
+
+\draw[-triangle 45] (security)--(service);
+\draw[-triangle 45] (service)--(task);
+\draw[-triangle 45] (service)--(nodes);
+\draw[-triangle 45] (service)--(registry);
+}
+}
+    \caption{Security Integration Architecture}
+    \label{fig:security-arch}
+\end{figure}
 
 \subsection{Inference Market}
 
-The ecosystem is anchored by an Inference Market. The protocol has a native queue of AI/ML workloads. A workload can be thought of as an end-to-end AI/ML Inference. Each workload specifies all required details to complete it, such as input data, specific AI model for execution, output data requirements or on-chain execution. Workloads posted to the network are priced according to their computational complexity.
+The ecosystem is anchored by an Inference Market. The protocol has a native queue of AI/ML workloads. A workload can be thought of as an end-to-end AI/ML Inference.
+Each workload specifies all required details to complete it, such as input data, specific AI model for execution, output data requirements or on-chain execution.
+Workloads posted to the network are priced according to their computational complexity.
+Dynamic pricing may be used to adjust fees in real-time based on network congestion and demand urgency, incentivizing workers to prioritize high-value tasks with faster turnaround times by offering premium rates for rapid completion.
+Simultaneously, it encourages users to offload less urgent or computationally lighter workloads during peak periods, balancing supply and demand while reducing queue delays.
+By aligning monetary incentives with speed and congestion signals, the system optimizes resource allocation, ensuring efficient execution without overburdening the network.
+
+To enhance efficiency in workload allocation, the Inference Market may employ a reverse Dutch auction framework.
+Users submit jobs with a specified minimum acceptable price (reflecting their budget or urgency) and a maximum price they are willing to pay.
+The protocol then dynamically escalates the job’s price over time, from the user’s minimum bid upward toward their maximum, until a worker accepts the task at the current price point.
+This mechanism incentivizes workers to act quickly to secure lower prices while giving users control over their budget and desired urgency.
+If no worker accepts the job by the max price threshold (or a predefined timeout), the task is either rejected or re-entered into the queue with updated pricing signals, allowing it to compete again under new conditions.
 
 \subsection{Model Registry}
 
-After circuitizing a model with the Inference Network SDK, its creator will register it on the network. This defines the required input and output data format, computational cost of inferences on the model (proportional to cost of compute for an inference) and the verification key for use in a verification contract upon completion of each inference from the model.
+After circuitizing a model with the Inference Network SDK, its creator registers it on the network. This defines the required input and output data format, computational cost in FUCU, and the verification strategy (on-chain via verifier contract or off-chain via aggregator). The registry also stores the verifier contract address for on-chain verification and enforces registration fees to prevent spam.
 
 \subsection{Model Node Pool Registration}
 
-In order to complete inference workloads for a model, a model node must register its intent to complete workloads for specific models. Once registered the node is added to the pool of available nodes. Nodes may be registered to service multiple models, but it is the responsibility of the operator to ensure the node completes assigned workloads.
+In order to complete inference workloads for a model, a model node must register its intent to complete workloads for specific models, as shown in Figure~\ref{fig:Fig 3}. Once registered the node is added to the pool of available nodes. Nodes may be registered to service multiple models, but it is the responsibility of the operator to ensure the node completes assigned workloads.
 
 \begin{figure}[!ht]
     \centering
@@ -392,7 +440,37 @@ In order to complete inference workloads for a model, a model node must register
 
 The network implements sets of blocks, called epochs, in which a registered node must be available. Nodes that register in the current epoch are activated during the following epoch. Model nodes commit compute units per unit of time to the network. Since the compute units for a workload are known ahead of time the network delegates workloads to fill but not exceed its compute capacity.
 
-It is the expectation that a model node will complete delegated workloads during a registered epoch. Model nodes which fail to complete work while registered or otherwise shown to be unavailable will face a penalty.
+It is the expectation that a model node will complete delegated workloads during a registered epoch. Model nodes which fail to complete work while registered or otherwise shown to be unavailable will face slashing of their staked collateral.
+
+Tasks follow a lifecycle managed by the InferenceTaskManager, as illustrated in Figure~\ref{fig:task-lifecycle}.
+
+\begin{figure}[htbp]
+    \centering
+    \scalebox{0.65}{
+\tikz{
+\tikzstyle{state}=[draw, inner sep=0pt, outer sep=0pt, minimum width=2.4cm, minimum height=0.9cm, rounded corners=2mm, align=center, font=\small]
+\tikzstyle{decision}=[draw, diamond, inner sep=0pt, outer sep=0pt, minimum width=1.6cm, minimum height=1.6cm, align=center, font=\scriptsize]
+
+\node[state] (created) {CREATED};
+\node[state, below=0.8cm of created] (assigned) {ASSIGNED};
+\node[state, below=0.8cm of assigned] (completed) {COMPLETED};
+\node[decision, below=0.8cm of completed] (challenge) {Challenge?};
+\node[state, below=0.8cm of challenge] (challenged) {CHALLENGED};
+\node[state, below=0.8cm of challenged] (resolved) {RESOLVED};
+\node[state, right=1.5cm of resolved] (rejected) {REJECTED};
+
+\draw[-triangle 45] (created)--node[right, font=\scriptsize] {sendTask} (assigned);
+\draw[-triangle 45] (assigned)--node[right, font=\scriptsize] {submitOutput} (completed);
+\draw[-triangle 45] (completed)--(challenge);
+\draw[-triangle 45] (challenge)--node[right, font=\scriptsize] {Yes} (challenged);
+\draw[-triangle 45] (challenge.west)--node[above, font=\scriptsize] {No} ++(-1.5,0)|-(resolved.west);
+\draw[-triangle 45] (challenged)--node[right, font=\scriptsize] {Valid} (resolved);
+\draw[-triangle 45] (challenged.east)--node[above, font=\scriptsize] {Invalid} ++(1.5,0)--(rejected.north);
+}
+}
+    \caption{Task Lifecycle State Machine}
+    \label{fig:task-lifecycle}
+\end{figure}
 
 \subsection{Model Vetting}
 
@@ -536,7 +614,7 @@ The evaluation of properties and performance across various ZKML projects has re
 
 ZKML uses Halo2 to generate proving and verification keys.  It aims to facilitate the recursive composition of zk-SNARKS, allowing for more scalable and efficient proofs~\cite{ZcashHalo2GH}. Halo2 represents the next generation of zk-SNARK technology after the original Halo protocol.
 
-EZKL is a library and command-line tool for doing inference for deep learning models and other computational graphs in a zk-snark (ZKML). EZKL works as follows~\cite{ZconduitEZKLGH}:
+EZKL is a library and command-line tool for doing inference for deep learning models and other computational graphs in a ZK-SNARK (ZKML). EZKL works as follows~\cite{ZconduitEZKLGH}:
 
 \begin{figure}[!ht]
     \centering
@@ -590,7 +668,7 @@ EZKL is a library and command-line tool for doing inference for deep learning mo
 
     \item	Using training data, the defined model will be trained and the final model will export as an .onnx file.
 
-    \item	Point ezkl to the .onnx and input of the model (as a .json file) to generate a ZK-SNARK circuit which will work as the following figure. From here a nearly 1:1 representation of the model is outlaid in a circuit.
+    \item	Point ezkl to the .onnx and input of the model (as a .json file) to generate a ZK-SNARK circuit, represented by the following figure. From here a nearly 1:1 representation of the model is outlaid in a circuit.
 
 \end{enumerate}
 
@@ -684,6 +762,60 @@ ZKML and other privacy-preserving machine learning (PPML) technologies hold the 
 To address this issue, companies should demonstrate the fairness of their AI models. A naïve solution would be for these companies to publicly disclose their algorithms. However, this approach conflicts with their intellectual property rights. Therefore, ZKML proposes a solution whereby companies can prove that they are using a specific algorithm for all users without revealing any information about their models. Kang et al.~\cite{TensorPlonkMedium}. have provided insights into the ZKML system, which operates using GPU acceleration (GPA). The use of GPA can accelerate the proof generation process by over 1000 times. Consequently, they suggest that Twitter could generate proofs for 1\% of the 500 million tweets per day from its users for approximately \$21,000 per day. Given that this cost represents less than 0.5\% of Twitter's annual infrastructure expenses, it is feasible for Twitter to demonstrate the fairness of its feed AI models.
 
 In the future, as AI models increasingly handle decision-making and various tasks, responsible AI will become even more critical than it is today. Simultaneously, with a shift towards decentralization, most communications and transactions are expected to occur on Web3. In such an environment, Inference Network will play a vital role by enabling AI model operators to broadcast proofs of honesty on Web3 without compromising the confidentiality of their model details.
+
+\section{Risk Disclosures}
+
+Prospective network participants should carefully consider the following risks.
+
+\subsection{Technology Risk}
+The Inference Network relies on complex smart contracts and cryptographic systems. Risks include:
+\begin{itemize}
+\item Smart contract vulnerabilities or bugs that could result in loss of funds or incorrect operation
+\item Ethereum network failures, congestion, or protocol changes affecting service availability
+\item Zero-knowledge proof system limitations or vulnerabilities
+\item Dependencies on external infrastructure (storage networks, oracles)
+\end{itemize}
+
+\subsection{Operator Risk}
+Network operators may:
+\begin{itemize}
+\item Fail to complete assigned inference tasks within required timeframes
+\item Submit incorrect results, triggering slashing mechanisms
+\item Experience hardware failures or connectivity issues affecting availability
+\item Collude to manipulate network operations (mitigated by stake-backed security)
+\end{itemize}
+
+\subsection{Model Risk}
+AI models deployed on the network may:
+\begin{itemize}
+\item Produce incorrect or biased outputs despite correct execution
+\item Become outdated as training data ages
+\item Contain vulnerabilities to adversarial inputs
+\item Have verification costs that exceed practical limits for complex architectures
+\end{itemize}
+
+\subsection{Regulatory Risk}
+Cryptocurrency and AI regulations vary by jurisdiction and are evolving. Future regulatory changes could restrict network operations, impose compliance requirements, or affect the legal classification of network services in certain jurisdictions.
+
+\section{Environmental Impact}
+
+\subsection{Consensus Mechanism}
+Inference Network operates on Ethereum, which transitioned to Proof-of-Stake (PoS) in September 2022. The network no longer relies on energy-intensive Proof-of-Work mining.
+
+\subsection{Energy Consumption}
+\textbf{Ethereum Proof-of-Stake:} The Ethereum network's transition to PoS reduced its energy consumption by approximately 99.95\% compared to the previous Proof-of-Work mechanism. Inference Network inherits this efficiency.
+
+\textbf{Inference Computation:} AI inference computations performed by network operators consume energy. However, this computation would occur regardless of blockchain verification. The zero-knowledge proof generation adds computational overhead but does not require specialized mining hardware.
+
+\subsection{Environmental Considerations}
+\begin{itemize}
+\item No additional consensus mechanism beyond Ethereum PoS
+\item No mining hardware requirements
+\item Operators use standard computing infrastructure (GPUs, CPUs)
+\item Proof generation is computationally intensive but temporary per task
+\end{itemize}
+
+The protocol does not introduce novel consensus mechanisms with significant environmental impact beyond the underlying Ethereum network.
 
 \section{Conclusion}
 Inference Network presents a comprehensive solution to the challenges of integrating AI and blockchain technology. It provides a decentralized protocol that enables secure, off-chain AI model inferences while preserving intellectual property through zero-knowledge cryptography. This innovative approach not only enhances privacy and security but also ensures the integrity and authenticity of AI models. The Inference Network architecture is designed to be modular and adaptable, supporting rapid deployment across multiple blockchain ecosystems. This work reﬂects a signiﬁcant step towards realizing a decentralized, secure, and privacy-preserving foundation for AI-enhanced blockchain systems, potentially revolutionizing the way AI operates in the blockchain space and contributing to the broader adoption of web3 technologies.
