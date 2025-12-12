@@ -390,7 +390,18 @@ The on-chain component of the Inference Network system acts as the interface for
 
 \subsection{Inference Market}
 
-The ecosystem is anchored by an Inference Market. The protocol has a native queue of AI/ML workloads. A workload can be thought of as an end-to-end AI/ML Inference. Each workload specifies all required details to complete it, such as input data, specific AI model for execution, output data requirements or on-chain execution. Workloads posted to the network are priced according to their computational complexity.
+The ecosystem is anchored by an Inference Market. The protocol has a native queue of AI/ML workloads. A workload can be thought of as an end-to-end AI/ML Inference.
+Each workload specifies all required details to complete it, such as input data, specific AI model for execution, output data requirements or on-chain execution.
+Workloads posted to the network are priced according to their computational complexity.
+Dynamic pricing may be used to adjust fees in real-time based on network congestion and demand urgency, incentivizing workers to prioritize high-value tasks with faster turnaround times by offering premium rates for rapid completion.
+Simultaneously, it encourages users to offload less urgent or computationally lighter workloads during peak periods, balancing supply and demand while reducing queue delays.
+By aligning monetary incentives with speed and congestion signals, the system optimizes resource allocation, ensuring efficient execution without overburdening the network.
+
+To enhance efficiency in workload allocation, the Inference Market may employ a reverse Dutch auction framework.
+Users submit jobs with a specified minimum acceptable price (reflecting their budget or urgency) and a maximum price they are willing to pay.
+The protocol then dynamically escalates the job’s price over time, from the user’s minimum bid upward toward their maximum, until a worker accepts the task at the current price point.
+This mechanism incentivizes workers to act quickly to secure lower prices while giving users control over their budget and desired urgency.
+If no worker accepts the job by the max price threshold (or a predefined timeout), the task is either rejected or re-entered into the queue with updated pricing signals, allowing it to compete again under new conditions.
 
 \subsection{Model Registry}
 
