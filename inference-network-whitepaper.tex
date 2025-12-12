@@ -334,7 +334,7 @@ This adaptability is a core characteristic, anticipating the need to integrate a
     \label{fig:Fig 2}
 \end{figure}
 
-These pools consist of registered nodes that are assigned to process specific models' inference workloads. After registration, a model node becomes part of the available workforce. A node may service multiple models, and it is incumbent upon the node operator to ensure the successful completion of assigned tasks. Nodes pledge a certain amount of computational power, measured in FUCUs (Foundational Universal Compute Units), to the network. With the computational requirements of workloads being predetermined, the network allocates tasks accordingly and does not exceed a node's capacity. A node is expected to fulfill its commitments within the epoch it is registered. Any failure to perform, or indication of unavailability, may result in slashing of staked collateral.
+These pools consist of registered nodes that are assigned to process specific models' inference workloads. After registration, a model node becomes part of the available workforce. A node may service multiple models, and it is incumbent upon the node operator to ensure the successful completion of assigned tasks. Nodes pledge a certain amount of computational power, measured in FUCU (Foundational Universal Compute Units), to the network. With the computational requirements of workloads being predetermined, the network allocates tasks accordingly and does not exceed a node's capacity. A node is expected to fulfill its commitments within the epoch it is registered. Any failure to perform, or indication of unavailability, may result in slashing of staked collateral.
 
 \textit{Aggregator Service: }The Aggregator is an off-chain service that coordinates the network. It submits inference tasks, probabilistically challenges completed tasks for verification, verifies EZKL proofs submitted by operators, and calls resolveTask to trigger rewards or slashing based on verification results. The aggregator role is designed to be permissionless, allowing any party to participate in network coordination.
 
@@ -406,7 +406,7 @@ If no worker accepts the job by the max price threshold (or a predefined timeout
 
 \subsection{Model Registry}
 
-After circuitizing a model with the Inference Network SDK, its creator registers it on the network. This defines the required input and output data format, computational cost in FUCUs, and the verification strategy (on-chain via verifier contract or off-chain via aggregator). The registry also stores the verifier contract address for on-chain verification and enforces registration fees to prevent spam.
+After circuitizing a model with the Inference Network SDK, its creator registers it on the network. This defines the required input and output data format, computational cost in FUCU, and the verification strategy (on-chain via verifier contract or off-chain via aggregator). The registry also stores the verifier contract address for on-chain verification and enforces registration fees to prevent spam.
 
 \subsection{Model Node Pool Registration}
 
@@ -614,7 +614,7 @@ The evaluation of properties and performance across various ZKML projects has re
 
 ZKML uses Halo2 to generate proving and verification keys.  It aims to facilitate the recursive composition of zk-SNARKS, allowing for more scalable and efficient proofs~\cite{ZcashHalo2GH}. Halo2 represents the next generation of zk-SNARK technology after the original Halo protocol.
 
-EZKL is a library and command-line tool for doing inference for deep learning models and other computational graphs in a zk-snark (ZKML). EZKL works as follows~\cite{ZconduitEZKLGH}:
+EZKL is a library and command-line tool for doing inference for deep learning models and other computational graphs in a ZK-SNARK (ZKML). EZKL works as follows~\cite{ZconduitEZKLGH}:
 
 \begin{figure}[!ht]
     \centering
@@ -668,7 +668,7 @@ EZKL is a library and command-line tool for doing inference for deep learning mo
 
     \item	Using training data, the defined model will be trained and the final model will export as an .onnx file.
 
-    \item	Point ezkl to the .onnx and input of the model (as a .json file) to generate a ZK-SNARK circuit which will work as the following figure. From here a nearly 1:1 representation of the model is outlaid in a circuit.
+    \item	Point ezkl to the .onnx and input of the model (as a .json file) to generate a ZK-SNARK circuit, represented by the following figure. From here a nearly 1:1 representation of the model is outlaid in a circuit.
 
 \end{enumerate}
 
